@@ -27,11 +27,23 @@ module.exports = function (app) {
       var project = req.params.project;
       // this is always empty in normal use, it gets populated with tests
       var searchQuery = req.query;
-
-      // search db via query params, defaults to blank so full list is displayed on page
-      Issue.find(searchQuery, function(err, issues){
-        res.json(issues)
+  
+      // get the board name and use it to find the project id from the db.
+      Project.find({title: project}, function(err, project){
       })
+        // the promise returns the document
+        .then(function (project) {
+        // get the documents id
+        let projectID = project[0]._id;
+        // search the db for issues with the associated project id
+        Issue.find({project_id: projectID})
+          // sort open status so true is at the top of the list and closed is at the bottom
+          .sort({open: -1})
+          // send back the sorted list
+          .then(function (list) {
+          res.json(list) 
+        })
+      });
     })
     
     .post(function (req, res){
@@ -80,7 +92,7 @@ module.exports = function (app) {
           Project.find({title: project}, function(err, existingProject){
             
             const new_issue = new Issue({
-            project_id:   existingProject._id,
+            project_id:   existingProject[0]._id,
             issue_title:  issue_title,
             issue_text:   issue_text,
             created_by:   created_by,
@@ -142,4 +154,11 @@ module.exports = function (app) {
       });
       }
     });
+  
+  app.route('/api/projects')
+    .get(function (req, res){
+      Project.find({}, function(err, project){
+        res.json(project);
+        })
+    })
 };

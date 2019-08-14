@@ -1,41 +1,83 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Welcome to HyperDev!</title>
-    <meta name="description" content="A cool thing made with HyperDev">
+    <title>Issue Tracker | Board</title>
+    <meta name="description" content="An issue tracker made for Free Code Camp">
     <link id="favicon" rel="icon" href="https://hyperdev.com/favicon-app.ico" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="/public/style.css">
+    <!-- bootstrap config-->
+    <link rel="stylesheet" 
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" 
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+          crossorigin="anonymous">
   </head>
   <body>
-    <header>
+    <div id="main-container" class="content d-flex flex-column">
+      <header class="nav">
+        <a class="nav-link" href="https://abundant-psychology.glitch.me/" id="home">Home</a>
+      </header>
       <h1 id="projectTitle"></h1>
-    </header>
-    <center>
-      <div id="submitNewIssue">
-        <br>
-        <h3>Submit a new issue:</h3>
-        <form id="newIssue" method="post" action="/api/">
-          <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;" required=""><br>
-          <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;" required=""></textarea><br>
-          <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required="">
-          <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px">
-          <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-          <button type="submit">Submit Issue</button>
-        </form>
+      <hr style="margin: 5vh">
+      <div id="list-detail-container" class="d-flex flex-column justify-content-center">
+        <div id="submitNewIssue" class="d-flex flex-column">
+          <h3 class="text-center">Submit a new issue</h3>
+          <form id="newIssue" method="post" action="/api/">
+            <div class="form-group">
+                <label for="issue-summary">*Issue Title:</label>
+                <input class="form-control" type="text" name="issue_title" required="">
+              </div>
+            <div class="form-group">
+            <div class="form-group">
+              <label for="issue-summary">*Issue Summary:</label>
+              <textarea type="text" name="issue_text" class="form-control" id="issue-summary" rows="3" required=""></textarea>
+            </div>
+            <div class="form-group  d-flex flex-row">
+              <input id="created_by_input" class="form-control" type="text" name="created_by" placeholder="*Created by" required="">
+              <input id="assigned_to_input" class="form-control" type="text" name="assigned_to" placeholder="Assigned to (opt)">
+            </div>
+              <label for="status-dropdown">Issue Status (opt):</label>
+              <select class="form-control" id="status-dropdown" name="status_text">
+                <option>Open</option>
+                <option>Closed</option>
+                <option>In Development</option>
+                <option>In Test</option>
+                <option>Triage</option>
+              </select>
+            </div>
+            <button class="form-control btn btn-success" type="submit">Submit Issue</button>
+          </form>
+        </div>
+        <hr id="rule-middle" style="margin: 5vh">
+        <div id="existing-issues">
+          <h3 class="text-center">List of existing issue</h3>
+          <div id="accordion-container">  
+        </div> 
+        </div>
       </div>
-      
-      <div id="issueDisplay"></div>
-      
-      <hr style="margin: 50px; margin-top: 200px">
-    </center>
-    
+    </div>
+    <footer class="footer text-center">
+      <p id="footer-container">
+        Created by <span class="important-text">Robby East</span> as part of <span class="important-text">Free Code Camp</span> project provided <a href="https://learn.freecodecamp.org/information-security-and-quality-assurance/information-security-and-quality-assurance-projects/issue-tracker">here</a>
+      </p>
+    </footer>
+    <div id="modal" class="modal fade" role="dialog"></div>
+    <!-- Your web-app is https, so your scripts need to be too -->
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-2.2.1.min.js"
             integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
             crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" 
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" 
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" 
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" 
+            crossorigin="anonymous"></script>
     <script>
+      // handler to populate the list of issues
       $(function() {
         var currentProject = window.location.pathname.replace(/\//g, "");;
         var url = "/api/issues/"+currentProject;
@@ -45,30 +87,65 @@
           url: url,
           success: function(data)
           {
-            var issues= [];
+            // array to hold the list of cards before pushing it to the main html element.
+            let list_holder= [];
+            // start of accordion
+            list_holder.push(`
+              <div class="accordion" id="accordionExample">
+            `)
+            // for each document sent back from the api, create an html card
             data.forEach(function(ele) {
-              var openstatus;
-              (ele.open) ? openstatus = 'open' : openstatus = 'closed';
-              var single = [
-                '<div class="issue '+openstatus+'">',
-                '<p class="id">id: '+ele._id+'</p>',
-                '<h3>'+ele.issue_title+' -  ('+openstatus+')</h3>',
-                '<br>',
-                '<p>'+ele.issue_text+'</p>',
-                '<p>'+ele.status_text+'</p>',
-                '<br>',
-                '<p class="id"><b>Created by:</b> '+ele.created_by+'  <b>Assigned to:</b> '+ele.assigned_to,
-                '<p class="id"><b>Created on:</b> '+ele.created_on+'  <b>Last updated:</b> '+ele.updated_on,
-                '<br><a href="#" class="closeIssue" id="'+ele._id+'">close?</a> <a href="#" class="deleteIssue" id="'+ele._id+'">delete?</a>',
-                '</div>'
-                
-              ];
-              issues.push(single.join(''));
+              // create a var to display open/closed instead of true/false based on open status. Used for card headers.
+              var open_status;
+              (ele.open) ? open_status = 'OPEN' : open_status = 'CLOSED';
+              var status_color;
+              (ele.open) ? status_color = 'badge-warning' : status_color = 'badge-secondary';  
+              // empty array to hold temperary card html before pushing it to larger list container.
+              let temp_card_holder = []
+              // create card with dynamic data sent back from api
+                temp_card_holder.push(`
+                  <div class="card">
+                    <div class="card-header" id="heading-${ele._id}">
+                      <h2 class="mb-0 d-flex align-items-center">
+                        <button id="header-${ele._id}" class="btn btn-link flex-grow-1 justify-content-start text-left" type="button" data-toggle="collapse" data-target="#collapse-${ele._id}" aria-expanded="true" aria-controls="collapse-${ele._id}">
+                          ${ele.issue_title}
+                        </button>
+                        <span class="badge badge-pill ${status_color}">${open_status}</span>
+                      </h2>
+                    </div>
+                    <div id="collapse-${ele._id}" class="collapse" aria-labelledby="heading-${ele._id}" data-parent="#accordionExample">
+                      <div class="card-body d-flex flex-column">
+                          <h4 class="card-sub-heading">Issue Summary:</h4>
+                          <p class="issue-text">${ele.issue_text}</p>
+                      </div>
+                      <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><span class="card-sub-heading">ID:</span> ${ele._id}</li>
+                        <li class="list-group-item"><span class="card-sub-heading">Detailed Status:</span> ${ele.status_text}</li>
+                        <li class="list-group-item"><span class="card-sub-heading">Created By:</span> ${ele.created_by}</li>
+                        <li class="list-group-item"><span class="card-sub-heading">Assigned To:</span> ${ele.assigned_to}</li>
+                        <li class="list-group-item"><span class="card-sub-heading">Updated On:</span> ${ele.updated_on}</li>
+                        <li class="list-group-item"><span class="card-sub-heading">Created On:</span> ${ele.created_on}</li>
+                        <li class="list-group-item d-flex justify-content-around">
+                          <button id="${ele._id}" class="closeIssue btn btn-success">Close Issue</button>
+                          <button id="${ele._id}" class="deleteIssue btn btn-danger">Delete Issue</button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                `);
+              // push each card into the card holder array
+              list_holder.push(temp_card_holder);  
             });
-            $('#issueDisplay').html(issues.join(''));
+            // end of accordion UI element
+                list_holder.push(`
+                  </div>
+                `)
+            // push the accordion UI to the main html container that holds it
+            $('#accordion-container').html(list_holder.join(''));
           }
         });
         
+        // handler to add a new issue to the list
         $('#newIssue').submit(function(e){
           e.preventDefault();
           $(this).attr('action', "/api/issues/" + currentProject);
@@ -80,28 +157,93 @@
           });
         });
         
-        $('#issueDisplay').on('click','.closeIssue', function(e) {
+        // handler to change the status of an issue
+        $('#accordion-container').on('click','.closeIssue', function(e) {
           var url = "/api/issues/"+currentProject;
           $.ajax({
             type: "PUT",
             url: url,
             // add different parameters to the data object below to test other updates besides status
             data: {_id: $(this).attr('id'), open: false},
-            success: function(data) { alert(data); window.location.reload(true); }
+            success: function(data) {
+              // create a modal with the string sent back from the api
+              $(`#modal`).html(`
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h4 class="modal-title">Issue Closed</h4>
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      <p>${data}</p>
+                    </div>
+                  </div>
+                </div>
+              `)
+              // display the modal
+              $('#modal').modal('show');
+            }
           });
           e.preventDefault();
         });
-        $('#issueDisplay').on('click','.deleteIssue', function(e) {
+        
+        // handler to delete an issue from the db
+        $('#accordion-container').on('click','.deleteIssue', function(e) {
           var url = "/api/issues/"+currentProject;
           $.ajax({
             type: "DELETE",
             url: url,
             data: {_id: $(this).attr('id')},
-            success: function(data) { alert(data); window.location.reload(true); }
+            success: function(data) {
+              // create a modal with the string sent back from the api
+              $(`#modal`).html(`
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h4 class="modal-title">Issue Deleted</h4>
+                      <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      <p>${data}</p>
+                    </div>
+                  </div>
+                </div>
+              `)
+              // display the modal
+              $('#modal').modal('show');
+            }
           });
           e.preventDefault();
         });
       });
    </script>
+    
+    <script>
+      // when the user selects the X or clicks outside the modal, reload the page.
+      $('#modal').on('hidden.bs.modal', function (e) {
+        window.location.reload(true);
+      })
+    </script>
+    
+    <script>
+      // responsive UI so that desktop is more horizontal and mobile is more vertical
+      var responsive_ui = function() {
+        // mobile view
+        if (document.body.clientWidth < 768) {
+          $('#list-detail-container').removeClass( "flex-row" ).addClass( "flex-column" );
+          $('#rule-middle').css('margin', '5vh')
+        // desktop view  
+        } else if (document.body.clientWidth >= 768) {
+          $('#list-detail-container').removeClass( "flex-column" ).addClass( "flex-row" );
+          $('#rule-middle').css('margin', '0px')
+        };
+      };
+      // trigger the function when the window size changes
+      $(window).resize(function(){
+        responsive_ui();
+      });
+      // trigger the function when the page first loads
+      responsive_ui();
+    </script>
   </body>
 </html>

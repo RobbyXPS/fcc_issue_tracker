@@ -1,11 +1,27 @@
-* {
-  margin: 0px;
-  padding: 0px;
+body, html { 
+  height: 100%;
+  margin: 0  !important;
+  padding: 0 !important;
 }
 
-body {
-  padding: 10px;
+.content {
+  flex: 1 0 auto; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  margin: 0 !important;
+  padding: 0 !important;
 }
+
+.nav {
+  background-color: green;
+  box-shadow: 0 5px 0 darkgreen;
+  min-height: 40px;
+}
+
+.important-text {
+  color: green;
+  font-weight: bold;
+}
+
+body { padding: 10px }
 
 .issue {
   margin: 20px;
@@ -14,10 +30,102 @@ body {
   border: 2px solid black;
 }
 
-.closed {
-  background-color: lightgrey;
+.closed { background-color: lightgrey }
+
+.id { font-size: 10.5px }
+
+.flex-column {
+  margin: 5%; 
+  padding: 5%;
 }
 
-.id {
-  font-size: 10.5px;
+#newIssue {
+  border: 5px solid darkgreen;
+  border-radius: 5px;
+  padding: 10%;
+}
+
+#created_by_input { margin-right: 1vw !important }
+
+#assigned_to_input { margin-left: 1vw !important }
+
+.badge { font-size: 40% !important }
+
+span { height: 75% !important }
+
+.card-body { margin: 0px !important }
+
+.card-sub-heading {
+  font-weight: 900;
+   color: darkgreen; 
+}
+
+.list-group-item {
+  font-size: .75rem;
+  padding: 1% !important;
+}
+
+.board-list-group {
+  padding: 0 10% 0 10%;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.board-list-item {
+  padding-left: 1em !important;
+  font-size: 1rem;
+}
+
+#footer-container {
+  margin-bottom: 0px !important;
+  padding: 5vh;
+  background-color: #f5f5f5;
+}
+
+footer {
+  flex-shrink: 0; /* Prevent Chrome, Opera, and Safari from letting these items shrink to smaller than their content's default minimum size. */
+  background: #42A5F5;
+}
+
+h1 {
+  padding: 10vh 2vh 2vh 2vh;
+  text-align: center;
+  color: green;
+  text-shadow:
+   -1px -1px 0 darkgreen,  
+   1px -1px 0 darkgreen,
+   -1px 1px 0 darkgreen,
+   1px 1px 0 darkgreen;
+}
+
+#submitNewIssue, #existing-issues { 
+  padding: 0% 5% 0% 5%;
+  min-width: 50%; 
+  margin: 0;
+}
+
+#list-detail-container {
+  margin: 0 0 1.5rem 0;
+  padding: 0;
+}
+
+h3, h2 { margin-bottom: 1.5rem !important }
+
+#home {
+  background-color: green;
+  color: white;
+  text-transform: uppercase;
+}
+
+#start-project-container {
+  width: 75%;
+  margin: auto;
+}
+
+#main-container { background-color: #eafaee }
+
+#start-project-button {
+  color: darkgreen !important;
+  background-color: #f5f5f5 !important;
 }

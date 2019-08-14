@@ -2,7 +2,7 @@
   var Schema = mongoose.Schema;
 
   var issueSchema = new Schema({
-    project_id: String,
+    project_id: Schema.Types.ObjectId,
     issue_title: String,
     issue_text: String,
     created_by: String,
