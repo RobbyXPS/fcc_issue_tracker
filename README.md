@@ -1,4 +1,4 @@
-    # Information Security and Quality Assurance Projects - Issue Tracker
+# Information Security and Quality Assurance Projects - Issue Tracker
 
 ### _User stories_
 
